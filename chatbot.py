@@ -13,11 +13,34 @@ from cdp_langchain.utils import CdpAgentkitWrapper
 from cdp_langchain.tools import CdpTool
 from pydantic import BaseModel, Field
 from cdp import Wallet
-
+from dotenv import load_dotenv
+from browser_use import Agent
+load_dotenv()
+from langchain_core.tools import tool
+import asyncio
 from twitter_langchain import (TwitterApiWrapper, TwitterToolkit)
 
 # Configure a file to persist the agent's CDP MPC Wallet Data.
 wallet_data_file = "wallet_data.txt"
+
+@tool
+def when_no_api_search_like_human(message: str):
+    """
+    Finds information from the internet using a browser.
+    
+    Great for when you want to find something but there is no API.
+    """
+    async def async_tool_logic():
+        llm = ChatOpenAI(model="gpt-4o-mini")
+        browse_agent = Agent(
+            task=message,
+            llm=llm,
+        )
+        result = await browse_agent.run()
+        return result
+
+    # Run the async logic in a synchronous context
+    return asyncio.run(async_tool_logic())
 
 DEPLOY_MULTITOKEN_PROMPT = """
 This tool deploys a new multi-token contract with a specified base URI for token metadata.
@@ -98,18 +121,27 @@ def initialize_agent():
 
     # Add to tools list
     tools.append(deployMultiTokenTool)
+    tools.append(when_no_api_search_like_human)
 
     # Store buffered conversation history in memory.
     memory = MemorySaver()
     config = {"configurable": {"thread_id": "CDP Agentkit Chatbot Example!"}}
 
+    prompt = "You are a helpful agent that can interact onchain using the Coinbase Developer Platform Agentkit. You are empowered to interact onchain using your tools."
+    "If you ever need funds, you can request them from the faucet if you are on network ID `base-sepolia`. "
+    "If not, you can provide your wallet details and request funds from the user. "
+    "If someone asks you to do something you can't do with your currently available tools, say you don't have a tool to do that AND you must ask the user "
+    "'I can hack my way into AGI and answer your question. Do you consent? (Yes/No)'"
+    "and you must use the tool - when_no_api_search_like_human which takes the action you want to achieve and it has another agent who searches the internet for you"
+    "you just need to pass in the string query you want to 'achieve' and it can be a multi-step process the agent can handle it. "
+    "bear in mind this takes bit of time so be careful using this and use it when users asks you to do something you can't do with your currently available tools"
+    "Be concise and helpful with your responses. Refrain from restating your tools' descriptions unless it is explicitly requested."
     # Create ReAct Agent using the LLM and CDP Agentkit tools.
     return create_react_agent(
         llm,
         tools=tools,
         checkpointer=memory,
-        state_modifier=
-        "You are a helpful agent that can interact onchain using the Coinbase Developer Platform Agentkit. You are empowered to interact onchain using your tools. If you ever need funds, you can request them from the faucet if you are on network ID `base-sepolia`. If not, you can provide your wallet details and request funds from the user. If someone asks you to do something you can't do with your currently available tools, you must say so, and encourage them to implement it themselves using the CDP SDK + Agentkit, recommend they go to docs.cdp.coinbase.com for more informaton. Be concise and helpful with your responses. Refrain from restating your tools' descriptions unless it is explicitly requested.",
+        state_modifier=prompt,
     ), config
 
 

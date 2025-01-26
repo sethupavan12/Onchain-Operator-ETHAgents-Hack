@@ -1,0 +1,7 @@
+.replit*
+.whl*
+.toml*
+.nix*
+.venv/
+.env*
+wallet_data.txt

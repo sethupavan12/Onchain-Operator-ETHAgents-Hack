@@ -16,12 +16,15 @@ load_dotenv()
 
 # Import tools
 from tools import (
-    fetch_news_tool,
-    FetchNewsInput,
-    deploy_multi_token,
-    DeployMultiTokenInput,
-    DEPLOY_MULTITOKEN_PROMPT,
-    when_no_api_search_like_human
+    deploy_multi_token, DeployMultiTokenInput, DEPLOY_MULTITOKEN_PROMPT,
+    fetch_news_tool, FetchNewsInput, FETCH_NEWS_PROMPT,
+    fetch_price, FetchPriceInput, FETCH_PRICE_PROMPT,
+    fetch_trading_signals, FetchTradingSignalsInput, FETCH_TRADING_SIGNALS_PROMPT,
+    fetch_top_market_cap, FetchTopMarketCapInput, FETCH_TOP_MARKET_CAP_PROMPT,
+    fetch_top_exchanges, FetchTopExchangesInput, FETCH_TOP_EXCHANGES_PROMPT,
+    fetch_top_volume, FetchTopVolumeInput, FETCH_TOP_VOLUME_PROMPT,
+
+    # when_no_api_search_like_human,
 )
 
 # Configure a file to persist the agent's CDP MPC Wallet Data.
@@ -34,6 +37,7 @@ def initialize_agent():
 
     wallet_data = None
     if os.path.exists(wallet_data_file):
+
         with open(wallet_data_file) as f:
             wallet_data = f.read()
 
@@ -57,6 +61,7 @@ def initialize_agent():
     twitter_toolkit = TwitterToolkit.from_twitter_api_wrapper(twitter_api_wrapper)
     tools.extend(twitter_toolkit.get_tools())
 
+    # Create Token 
     deployMultiTokenTool = CdpTool(
         name="deploy_multi_token",
         description=DEPLOY_MULTITOKEN_PROMPT,
@@ -65,17 +70,67 @@ def initialize_agent():
         func=deploy_multi_token,
     )
 
-    # Add additional tools.
-    tools.append(deployMultiTokenTool)
-    tools.append(when_no_api_search_like_human)
+    # Crypto Compare
     fetchNewsTool = CdpTool(
         name="fetch_news",
-        description="Fetch latest news for a given token. If no timestamp is provided, uses current time.",
+        description=FETCH_NEWS_PROMPT,
         cdp_agentkit_wrapper=agentkit,
         args_schema=FetchNewsInput,
         func=fetch_news_tool,
     )
-    tools.append(fetchNewsTool)
+
+    fetchPriceTool = CdpTool(
+        name="fetch_price",
+        description=FETCH_PRICE_PROMPT,
+        cdp_agentkit_wrapper=agentkit,
+        args_schema=FetchPriceInput,
+        func=fetch_price,
+    )
+
+    fetchTradingSignalsTool = CdpTool(
+        name="fetch_trading_signals",
+        description=FETCH_TRADING_SIGNALS_PROMPT,
+        cdp_agentkit_wrapper=agentkit,
+        args_schema=FetchTradingSignalsInput,
+        func=fetch_trading_signals,
+    )
+
+    fetchTopMarketCapTool = CdpTool(
+        name="fetch_top_market_cap",
+        description=FETCH_TOP_MARKET_CAP_PROMPT,
+        cdp_agentkit_wrapper=agentkit,
+        args_schema=FetchTopMarketCapInput,
+        func=fetch_top_market_cap,
+    )
+
+    fetchTopExchangesTool = CdpTool(
+        name="fetch_top_exchanges",
+        description=FETCH_TOP_EXCHANGES_PROMPT,
+        cdp_agentkit_wrapper=agentkit,
+        args_schema=FetchTopExchangesInput,
+        func=fetch_top_exchanges,
+    )
+
+    fetchTopVolumeTool = CdpTool(
+        name="fetch_top_volume",
+        description=FETCH_TOP_VOLUME_PROMPT,
+        cdp_agentkit_wrapper=agentkit,
+        args_schema=FetchTopVolumeInput,
+        func=fetch_top_volume,
+    )
+
+    # Add additional tools.
+    tools.append(deployMultiTokenTool)
+    # tools.append(when_no_api_search_like_human)
+
+    tools.extend([
+    fetchNewsTool,
+    fetchPriceTool,
+    fetchTradingSignalsTool,
+    fetchTopMarketCapTool,
+    fetchTopExchangesTool,
+    fetchTopVolumeTool
+    ])
 
     # Store buffered conversation history in memory.
     memory = MemorySaver()

@@ -3,5 +3,7 @@
 .toml*
 .nix*
 .venv/
+agentkit/
+__pycache__/
 .env*
 wallet_data.txt

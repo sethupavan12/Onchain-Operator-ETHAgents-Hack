@@ -18,7 +18,7 @@ Supports CDP Agentkit actions + our own actions, allowing it to perform blockcha
    - CDP API credentials from [CDP Portal](https://portal.cdp.coinbase.com/access/api)
    - X Social API (Account Key and secret, Access Key and Secret)
    - Crypto compare API key CRYPTO_COMPARE_API_KEY
-
+2. Fill ENV
 Fill this
 ```
 OPENAI_API_KEY=""
@@ -32,6 +32,14 @@ NETWORK_ID="base-sepolia"
 TWITTER_BEARER_TOKEN="fake"
 CRYPTO_COMPARE_API_KEY=""
 ```
+## Browser Use
+With pip:
+
+pip install browser-use
+install playwright:
+
+playwright install
+
 ## Quick Start
 
 1. **Configure Secrets and CDP API Keys**

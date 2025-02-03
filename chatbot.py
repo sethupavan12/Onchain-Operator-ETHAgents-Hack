@@ -45,7 +45,7 @@ from tools import (
     fetch_pair_ohlcv, PairOHLCVInput, PAIR_OHLCV_PROMPT,
 
     # Browser search
-    # when_no_api_search_like_human,
+    when_no_api_search_like_human,
 )
 
 # Configure a file to persist the agent's CDP MPC Wallet Data.
@@ -216,7 +216,6 @@ def initialize_agent():
 
     # Add additional tools.
     tools.append(deployMultiTokenTool)
-
     tools.extend([
     fetchNewsTool,
     fetchPriceTool,
@@ -225,10 +224,8 @@ def initialize_agent():
     fetchTopExchangesTool,
     fetchTopVolumeTool
     ])
-
     tools.extend(moralisTools)
-
-    # tools.append(when_no_api_search_like_human)
+    tools.append(when_no_api_search_like_human)
 
     # Store buffered conversation history in memory.
     memory = MemorySaver()

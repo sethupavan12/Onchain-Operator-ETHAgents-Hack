@@ -1,5 +1,5 @@
 from .token_tool import deploy_multi_token, DeployMultiTokenInput, DEPLOY_MULTITOKEN_PROMPT
-# from .browser_tool import when_no_api_search_like_human
+from .browser_tool import when_no_api_search_like_human
 from .crypto_compare_tools import (
     fetch_news_tool, FetchNewsInput, FETCH_NEWS_PROMPT,
     fetch_price, FetchPriceInput, FETCH_PRICE_PROMPT,
@@ -36,7 +36,7 @@ __all__ = [
     'deploy_multi_token', 'DeployMultiTokenInput', 'DEPLOY_MULTITOKEN_PROMPT',
 
     # Browser Search Tool
-    # 'when_no_api_search_like_human',
+    'when_no_api_search_like_human',
     
     # Crypto Compare Tools
     "fetch_news_tool", "FetchNewsInput", "FETCH_NEWS_PROMPT",

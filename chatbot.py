@@ -16,6 +16,7 @@ load_dotenv()
 
 # Import tools
 from tools import (
+    # crypto compare
     deploy_multi_token, DeployMultiTokenInput, DEPLOY_MULTITOKEN_PROMPT,
     fetch_news_tool, FetchNewsInput, FETCH_NEWS_PROMPT,
     fetch_price, FetchPriceInput, FETCH_PRICE_PROMPT,
@@ -24,6 +25,28 @@ from tools import (
     fetch_top_exchanges, FetchTopExchangesInput, FETCH_TOP_EXCHANGES_PROMPT,
     fetch_top_volume, FetchTopVolumeInput, FETCH_TOP_VOLUME_PROMPT,
 
+    # Moralis
+    # Core wallet functions
+    fetch_wallet_history, WalletHistoryInput, WALLET_HISTORY_PROMPT,
+    fetch_wallet_balance, WalletBalanceInput, WALLET_BALANCE_PROMPT,
+    
+    # NFT related functions
+    fetch_nft_transfers, NFTTransfersInput, NFT_TRANSFERS_PROMPT,
+    fetch_wallet_nft_trades, WalletNFTTradesInput, WALLET_NFT_TRADES_PROMPT,
+    
+    # Token related functions
+    fetch_token_transfers, TokenTransfersInput, TOKEN_TRANSFERS_PROMPT,
+    fetch_wallet_tokens, WalletTokensInput, WALLET_TOKENS_PROMPT,
+    fetch_token_price, TokenPriceInput, TOKEN_PRICE_PROMPT,
+    fetch_batch_token_prices, BatchTokenPriceInput, BATCH_TOKEN_PRICES_PROMPT,
+    
+    # DeFi related functions
+    fetch_defi_positions, DeFiPositionsInput, DEFI_POSITIONS_PROMPT,
+    
+    # Trading data functions
+    fetch_pair_ohlcv, PairOHLCVInput, PAIR_OHLCV_PROMPT,
+
+    # Browser search
     # when_no_api_search_like_human,
 )
 
@@ -119,9 +142,82 @@ def initialize_agent():
         func=fetch_top_volume,
     )
 
+    # Moralis API Tools
+    moralisTools = [
+        CdpTool(
+            name="wallet_history",
+            description="Fetch transaction history for a wallet address",
+            cdp_agentkit_wrapper=agentkit,
+            args_schema=WalletHistoryInput,
+            func=fetch_wallet_history,
+        ),
+        CdpTool(
+            name="wallet_balance",
+            description="Fetch balance for a wallet address",
+            cdp_agentkit_wrapper=agentkit,
+            args_schema=WalletBalanceInput,
+            func=fetch_wallet_balance,
+        ),
+        CdpTool(
+            name="nft_transfers",
+            description="Fetch NFT transfers for an address",
+            cdp_agentkit_wrapper=agentkit,
+            args_schema=NFTTransfersInput,
+            func=fetch_nft_transfers,
+        ),
+        CdpTool(
+            name="token_transfers",
+            description="Fetch token transfers for an address",
+            cdp_agentkit_wrapper=agentkit,
+            args_schema=TokenTransfersInput,
+            func=fetch_token_transfers,
+        ),
+        CdpTool(
+            name="wallet_nft_trades",
+            description="Fetch NFT trades for a wallet",
+            cdp_agentkit_wrapper=agentkit,
+            args_schema=WalletNFTTradesInput,
+            func=fetch_wallet_nft_trades,
+        ),
+        CdpTool(
+            name="wallet_tokens",
+            description="Fetch tokens owned by a wallet",
+            cdp_agentkit_wrapper=agentkit,
+            args_schema=WalletTokensInput,
+            func=fetch_wallet_tokens,
+        ),
+        CdpTool(
+            name="defi_positions",
+            description="Fetch DeFi positions for a wallet",
+            cdp_agentkit_wrapper=agentkit,
+            args_schema=DeFiPositionsInput,
+            func=fetch_defi_positions,
+        ),
+        CdpTool(
+            name="token_price",
+            description="Fetch price for a specific token",
+            cdp_agentkit_wrapper=agentkit,
+            args_schema=TokenPriceInput,
+            func=fetch_token_price,
+        ),
+        CdpTool(
+            name="batch_token_prices",
+            description="Fetch prices for multiple tokens",
+            cdp_agentkit_wrapper=agentkit,
+            args_schema=BatchTokenPriceInput,
+            func=fetch_batch_token_prices,
+        ),
+        CdpTool(
+            name="pair_ohlcv",
+            description="Fetch OHLCV data for a trading pair",
+            cdp_agentkit_wrapper=agentkit,
+            args_schema=PairOHLCVInput,
+            func=fetch_pair_ohlcv,
+        )
+    ]
+
     # Add additional tools.
     tools.append(deployMultiTokenTool)
-    # tools.append(when_no_api_search_like_human)
 
     tools.extend([
     fetchNewsTool,
@@ -131,6 +227,10 @@ def initialize_agent():
     fetchTopExchangesTool,
     fetchTopVolumeTool
     ])
+
+    tools.extend(moralisTools)
+
+    # tools.append(when_no_api_search_like_human)
 
     # Store buffered conversation history in memory.
     memory = MemorySaver()

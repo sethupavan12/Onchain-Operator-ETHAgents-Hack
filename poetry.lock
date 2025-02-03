@@ -2487,21 +2487,6 @@ files = [
 six = ">=1.5"
 
 [[package]]
-name = "python-dotenv"
-version = "1.0.1"
-description = "Read key-value pairs from a .env file and set them as environment variables"
-optional = false
-python-versions = ">=3.8"
-groups = ["main"]
-files = [
-    {file = "python-dotenv-1.0.1.tar.gz", hash = "sha256:e324ee90a023d808f1959c46bcbc04446a10ced277783dc6ee09987c37ec10ca"},
-    {file = "python_dotenv-1.0.1-py3-none-any.whl", hash = "sha256:f7b63ef50f1b690dddf550d03497b66d609393b40b564ed0d674909a68ebf16a"},
-]
-
-[package.extras]
-cli = ["click (>=5.0)"]
-
-[[package]]
 name = "pyunormalize"
 version = "16.0.0"
 description = "Unicode normalization forms (NFC, NFKC, NFD, NFKD). A library independent of the Python core Unicode database."
@@ -3344,4 +3329,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "5921b60a3cd37327446ab0fa2ec475ea8c23bda0f801c25ed4fa479d7f23c7c2"
+content-hash = "1303b16480354cdb6f2c99ba8f8d344f3323fe4c85af16df5f9c710a33e9c24d"

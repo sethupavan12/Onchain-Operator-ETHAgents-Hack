@@ -31,6 +31,7 @@ TWITTER_ACCESS_TOKEN_SECRET=""
 NETWORK_ID="base-sepolia"
 TWITTER_BEARER_TOKEN="fake"
 CRYPTO_COMPARE_API_KEY=""
+MORALIS_API_KEY=""
 ```
 ## Browser Use
 With pip:

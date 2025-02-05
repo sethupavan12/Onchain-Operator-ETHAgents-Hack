@@ -33,6 +33,171 @@ TWITTER_BEARER_TOKEN="fake"
 CRYPTO_COMPARE_API_KEY=""
 MORALIS_API_KEY=""
 ```
+
+## API Documentation
+
+The agent exposes a REST API that allows real-time interaction with streaming responses. The API is built using FastAPI and provides detailed information about the agent's actions and thought process.
+
+### Base URL
+```
+http://localhost:8000
+```
+
+### Endpoints
+
+#### 1. Chat with Agent
+```http
+POST /chat
+```
+
+**Request Body:**
+```json
+{
+    "message": string,    // The message to send to the agent
+    "stream": boolean     // Whether to stream the response (default: false)
+}
+```
+
+**Response Format:**
+
+For non-streaming requests (`stream: false`):
+```json
+{
+    "response": string    // The agent's complete response
+}
+```
+
+For streaming requests (`stream: true`), you'll receive a series of Server-Sent Events (SSE) with the following types:
+
+1. Thinking State:
+```json
+{
+    "type": "thinking",
+    "content": "Processing your request...",
+    "step": "start"
+}
+```
+
+2. Tool Usage:
+```json
+{
+    "type": "tool_usage",
+    "content": string,        // Description of the tool being used
+    "tool_type": string      // Type of tool: "external_api", "internal", or "unknown"
+}
+```
+
+3. Response:
+```json
+{
+    "type": "message",
+    "content": string,        // The agent's response
+    "step": "response"
+}
+```
+
+4. Error (if any):
+```json
+{
+    "type": "error",
+    "content": string,        // Error message
+    "step": "error"
+}
+```
+
+#### 2. Health Check
+```http
+GET /health
+```
+
+**Response:**
+```json
+{
+    "status": "healthy",
+    "agent_initialized": boolean,
+    "config_loaded": boolean
+}
+```
+
+### Example Usage
+
+#### Non-streaming Request
+```javascript
+// Using fetch
+const response = await fetch('http://localhost:8000/chat', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        message: "What are the current top cryptocurrency exchanges?",
+        stream: false
+    })
+});
+const data = await response.json();
+console.log(data.response);
+```
+
+#### Streaming Request
+```javascript
+// Using EventSource
+const sse = new EventSource('/chat');
+const response = await fetch('http://localhost:8000/chat', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        message: "What are the current top cryptocurrency exchanges?",
+        stream: true
+    })
+});
+
+// Handle the streaming response
+const reader = response.body.getReader();
+const decoder = new TextDecoder();
+
+while (true) {
+    const {value, done} = await reader.read();
+    if (done) break;
+    
+    const chunk = decoder.decode(value);
+    const messages = chunk.split('\n').filter(Boolean);
+    
+    for (const message of messages) {
+        const data = JSON.parse(message);
+        switch (data.type) {
+            case 'thinking':
+                console.log('Agent is thinking:', data.content);
+                break;
+            case 'tool_usage':
+                console.log('Using tool:', data.content);
+                break;
+            case 'message':
+                console.log('Agent response:', data.content);
+                break;
+            case 'error':
+                console.error('Error:', data.content);
+                break;
+        }
+    }
+}
+```
+
+### Running the API Server
+
+1. Install dependencies:
+```bash
+poetry install
+```
+
+2. Start the server:
+```bash
+poetry run uvicorn api:app --reload
+```
+
+The API will be available at `http://localhost:8000`. You can access the interactive API documentation at `http://localhost:8000/docs`.
+
 ## Browser Use
 With pip:
 
@@ -60,6 +225,7 @@ Every agent comes with an associated wallet. Wallet data is read from wallet_dat
 - Autonomous mode for self-directed blockchain operations
 - Full CDP Agentkit integration
 - Persistent wallet management
+- RESTful API with streaming support
 
 ## Source
 This template is based on the CDP Agentkit examples. For more information, visit:

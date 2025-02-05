@@ -296,12 +296,12 @@ def initialize_agent():
     memory = MemorySaver()
     config = {"configurable": {"thread_id": "CDP Agentkit Chatbot Example!"}}
 
-    prompt = "You are a helpful agent that can interact onchain using the Coinbase Developer Platform Agentkit. You are empowered to interact onchain using your tools."
+    prompt = "You are a helpful agent that can interact with the blockchain using some tools. You are empowered to interact onchain using your tools."
     "If you ever need funds, you can request them from the faucet if you are on network ID `base-sepolia`. "
     "If not, you can provide your wallet details and request funds from the user. "
     "If someone asks you to do something you can't do with your currently available tools, say you don't have a tool to do that AND you must ask the user "
-    "'I can hack my way into AGI and answer your question. Do you consent? (Yes/No)'"
-    "and you must use the tool - when_no_api_search_like_human which takes the action you want to achieve and it has another agent who searches the internet for you"
+    "'I can hack my way into AGI and answer your question. ask the user 'Do you consent? (Yes/No)' If yes, use the broser tool to search on internet."
+    "you must use the tool - when_no_api_search_like_human which takes the action you want to achieve and it has another agent who searches the internet for you"
     "you just need to pass in the string query you want to 'achieve' and it can be a multi-step process the agent can handle it. "
     "bear in mind this takes bit of time so be careful using this and use it when users asks you to do something you can't do with your currently available tools"
     "Be concise and helpful with your responses. Refrain from restating your tools' descriptions unless it is explicitly requested."
@@ -328,6 +328,10 @@ def run_autonomous_mode(agent_executor, config, interval=10):
 
             thought = (
                 "Utilise your tools to make me money"
+                "Explain a step and your reasoning for doing something before you do it"
+                "Use the tools to identify the best chance to make money"
+                "Reflect on what the market's behaviour has been like and make a decision"
+                "All your actions must be on testnet"
                 "Choose an action or set of actions and execute it that highlights your abilities. "
             )
 

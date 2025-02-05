@@ -185,7 +185,7 @@ def fetch_news(token: str, timestamp: int = None):
         timestamp = int(time.time())
 
     print(f"Fetching news for timestamp: {timestamp}")
-    url = f"{NEWS_CRYPTO_COMPARE_BASE_URL}/data/v2/news/?lang=EN&lTs={timestamp}&categories={token}&sign=true"
+    url = f"{CRYPTO_COMPARE_BASE_URL}/data/v2/news/?lang=EN&lTs={timestamp}&categories={token}&sign=true"
     headers = {
         "Accept": "application/json",
         "Authorization": f"Bearer {CRYPTO_COMPARE_API_KEY}"

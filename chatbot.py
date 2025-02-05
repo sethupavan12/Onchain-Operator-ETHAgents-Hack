@@ -44,6 +44,15 @@ from tools import (
     # Trading data functions
     fetch_pair_ohlcv, PairOHLCVInput, PAIR_OHLCV_PROMPT,
 
+   # Graph Protocol Tools
+   fetch_large_swaps, GraphLargeSwapsInput, GRAPH_LARGE_SWAPS_PROMPT,
+   fetch_new_high_tvl_pools, GraphNewHighTVLPoolsInput, GRAPH_NEW_HIGH_TVL_POOLS_PROMPT,
+   fetch_high_fee_pools, GraphHighFeePoolsInput, GRAPH_HIGH_FEE_POOLS_PROMPT,
+   fetch_undervalued_tokens, GraphUndervaluedTokensInput, GRAPH_UNDERVALUED_TOKENS_PROMPT,
+   fetch_whale_accumulation, GraphWhaleAccumulationInput, GRAPH_WHALE_ACCUMULATION_PROMPT,
+   fetch_swap_trends, GraphSwapTrendsInput, GRAPH_SWAP_TRENDS_PROMPT,
+   fetch_gas_fees, GraphGasFeesInput, GRAPH_GAS_FEES_PROMPT,
+
     # Browser search
     when_no_api_search_like_human,
 )
@@ -214,8 +223,62 @@ def initialize_agent():
         )
     ]
 
+    # Graph Protocol Tools
+    theGraphUniswapV3Tools = [
+        CdpTool(
+            name="large_swaps",
+            description=GRAPH_LARGE_SWAPS_PROMPT,
+            cdp_agentkit_wrapper=agentkit,
+            args_schema=GraphLargeSwapsInput,
+            func=fetch_large_swaps,
+        ),
+        CdpTool(
+            name="new_high_tvl_pools",
+            description=GRAPH_NEW_HIGH_TVL_POOLS_PROMPT,
+            cdp_agentkit_wrapper=agentkit,
+            args_schema=GraphNewHighTVLPoolsInput,
+            func=fetch_new_high_tvl_pools,
+        ),
+        CdpTool(
+            name="high_fee_pools",
+            description=GRAPH_HIGH_FEE_POOLS_PROMPT,
+            cdp_agentkit_wrapper=agentkit,
+            args_schema=GraphHighFeePoolsInput,
+            func=fetch_high_fee_pools,
+        ),
+        CdpTool(
+            name="undervalued_tokens",
+            description=GRAPH_UNDERVALUED_TOKENS_PROMPT,
+            cdp_agentkit_wrapper=agentkit,
+            args_schema=GraphUndervaluedTokensInput,
+            func=fetch_undervalued_tokens,
+        ),
+        CdpTool(
+            name="whale_accumulation",
+            description=GRAPH_WHALE_ACCUMULATION_PROMPT,
+            cdp_agentkit_wrapper=agentkit,
+            args_schema=GraphWhaleAccumulationInput,
+            func=fetch_whale_accumulation,
+        ),
+        CdpTool(
+            name="swap_trends",
+            description=GRAPH_SWAP_TRENDS_PROMPT,
+            cdp_agentkit_wrapper=agentkit,
+            args_schema=GraphSwapTrendsInput,
+            func=fetch_swap_trends,
+        ),
+        CdpTool(
+            name="gas_fees",
+            description=GRAPH_GAS_FEES_PROMPT,
+            cdp_agentkit_wrapper=agentkit,
+            args_schema=GraphGasFeesInput,
+            func=fetch_gas_fees,
+        ),
+    ]
+
     # Add additional tools.
     tools.append(deployMultiTokenTool)
+
     tools.extend([
     fetchNewsTool,
     fetchPriceTool,
@@ -225,6 +288,8 @@ def initialize_agent():
     fetchTopVolumeTool
     ])
     tools.extend(moralisTools)
+    tools.extend(theGraphUniswapV3Tools)
+
     tools.append(when_no_api_search_like_human)
 
     # Store buffered conversation history in memory.
@@ -256,8 +321,13 @@ def run_autonomous_mode(agent_executor, config, interval=10):
     while True:
         try:
             # Provide instructions autonomously
+            # thought = (
+            #     "Be creative and do something interesting on the blockchain. "
+            #     "Choose an action or set of actions and execute it that highlights your abilities. "
+            # )
+
             thought = (
-                "Be creative and do something interesting on the blockchain. "
+                "Utilise your tools to make me money"
                 "Choose an action or set of actions and execute it that highlights your abilities. "
             )
 

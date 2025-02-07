@@ -52,6 +52,7 @@ from tools import (
    fetch_whale_accumulation, GraphWhaleAccumulationInput, GRAPH_WHALE_ACCUMULATION_PROMPT,
    fetch_swap_trends, GraphSwapTrendsInput, GRAPH_SWAP_TRENDS_PROMPT,
    fetch_gas_fees, GraphGasFeesInput, GRAPH_GAS_FEES_PROMPT,
+   fetch_arbitrage_opportunities, GraphArbitrageInput, GRAPH_ARBITRAGE_PROMPT,
 
     # Browser search
     when_no_api_search_like_human,
@@ -274,6 +275,13 @@ def initialize_agent():
             args_schema=GraphGasFeesInput,
             func=fetch_gas_fees,
         ),
+        # CdpTool(
+        #     name="fetch_arbitrage_opportunities",
+        #     description=GRAPH_ARBITRAGE_PROMPT,
+        #     cdp_agentkit_wrapper=agentkit,
+        #     args_schema=GraphArbitrageInput,
+        #     func=fetch_arbitrage_opportunities,
+        # ),
     ]
 
     # Add additional tools.

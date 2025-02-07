@@ -37,6 +37,7 @@ from .the_graph_uniswap_base_tools import (
     fetch_whale_accumulation, GraphWhaleAccumulationInput, GRAPH_WHALE_ACCUMULATION_PROMPT,
     fetch_swap_trends, GraphSwapTrendsInput, GRAPH_SWAP_TRENDS_PROMPT,
     fetch_gas_fees, GraphGasFeesInput, GRAPH_GAS_FEES_PROMPT,
+    fetch_arbitrage_opportunities, GraphArbitrageInput, GRAPH_ARBITRAGE_PROMPT,
 )
 
 __all__ = [
@@ -82,4 +83,5 @@ __all__ = [
     "fetch_whale_accumulation", "GraphWhaleAccumulationInput", "GRAPH_WHALE_ACCUMULATION_PROMPT",
     "fetch_swap_trends", "GraphSwapTrendsInput", "GRAPH_SWAP_TRENDS_PROMPT",
     "fetch_gas_fees", "GraphGasFeesInput", "GRAPH_GAS_FEES_PROMPT",
+    "fetch_arbitrage_opportunities", "GraphArbitrageInput", "GRAPH_ARBITRAGE_PROMPT",
 ]

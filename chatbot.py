@@ -12,6 +12,7 @@ from cdp_langchain.utils import CdpAgentkitWrapper
 from cdp_langchain.tools import CdpTool
 from dotenv import load_dotenv
 from twitter_langchain import TwitterApiWrapper, TwitterToolkit
+from langchain_groq import ChatGroq
 load_dotenv()
 
 # Import tools
@@ -63,9 +64,12 @@ wallet_data_file = "wallet_data.txt"
 
 def initialize_agent():
     """Initialize the agent with CDP Agentkit."""
-    # Initialize LLM.
-    llm = ChatOpenAI(model="gpt-4o-mini")
-
+    # Get oai llm if inference is not set or set to normal
+    if os.environ["INFERENCE"] == "normal" or not os.environ["INFERENCE"]:
+        llm = ChatOpenAI(model="gpt-4o-mini")
+    if os.environ["INFERENCE"] == "fast":
+        # llm = ChatGroq(temperature=0, model_name="llama-3.1-8b-instant")
+        llm = ChatGroq(temperature=0, model_name="llama-3.3-70b-versatile")
     wallet_data = None
     if os.path.exists(wallet_data_file):
 

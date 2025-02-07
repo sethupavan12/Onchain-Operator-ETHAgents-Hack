@@ -19,6 +19,7 @@ twitter-langchain = "^0.0.6"
 fastapi = "^0.109.2"
 uvicorn = "^0.27.1"
 python-dotenv = "^1.0.1"
+langchain-groq = "^0.2.4"
 
 [build-system]
 requires = ["poetry-core"]

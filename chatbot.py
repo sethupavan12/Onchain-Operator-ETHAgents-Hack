@@ -20,6 +20,9 @@ from tools import (
     # create an ERC-20 token
     deploy_multi_token, DeployMultiTokenInput, DEPLOY_MULTITOKEN_PROMPT,
 
+    # DALLE tool
+    create_dalle_tool, GenerateImageInput, GENERATE_IMAGE_PROMPT,
+
     # crypto compare
     fetch_news_tool, FetchNewsInput, FETCH_NEWS_PROMPT,
     fetch_price, FetchPriceInput, FETCH_PRICE_PROMPT,
@@ -103,6 +106,15 @@ def initialize_agent():
         cdp_agentkit_wrapper=agentkit,
         args_schema=DeployMultiTokenInput,
         func=deploy_multi_token,
+    )
+
+    # DALLE Image Generation
+    dalleImageTool = CdpTool(
+        name="generate_image",
+        description=GENERATE_IMAGE_PROMPT,
+        cdp_agentkit_wrapper=agentkit,
+        args_schema=GenerateImageInput,
+        func=create_dalle_tool,
     )
 
     # Crypto Compare
@@ -290,6 +302,7 @@ def initialize_agent():
 
     # Add additional tools.
     tools.append(deployMultiTokenTool)
+    tools.append(dalleImageTool)
 
     tools.extend([
     fetchNewsTool,

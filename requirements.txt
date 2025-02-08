@@ -75,6 +75,7 @@ httpx-ws==0.7.1
 idna==3.10
 importlib_metadata==8.5.0
 installer==0.7.0
+ipfshttpclient==0.8.0
 jaraco.classes==3.4.0
 jaraco.context==6.0.1
 jaraco.functools==4.1.0
@@ -184,7 +185,7 @@ tzlocal==5.2
 uritemplate==4.1.1
 urllib3==2.2.3
 virtualenv==20.29.1
-web3==7.7.0
+web3==6.15.1
 websockets==13.0.1
 wheel==0.45.1
 wrapt==1.17.2

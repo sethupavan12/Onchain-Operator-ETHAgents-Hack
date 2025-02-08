@@ -7,3 +7,4 @@ agentkit/
 __pycache__/
 .env*
 wallet_data.txt
+*.png

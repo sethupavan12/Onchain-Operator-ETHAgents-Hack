@@ -41,6 +41,7 @@ from .the_graph_uniswap_base_tools import (
     fetch_gas_fees, GraphGasFeesInput, GRAPH_GAS_FEES_PROMPT,
     fetch_arbitrage_opportunities, GraphArbitrageInput, GRAPH_ARBITRAGE_PROMPT,
 )
+from .web2_access_tool import web_search_tool, WebSearchInput, WEB_SEARCH_PROMPT
 
 __all__ = [
     # Token tools
@@ -56,6 +57,11 @@ __all__ = [
 
     # IPFS upload tools
     "create_pinata_upload_tool", "UploadImageToPinataInput", "UPLOAD_IMAGE_TO_PINATA_PROMPT" 
+    
+    # Web Search tools
+    'web_search_tool',
+    'WebSearchInput',
+    'WEB_SEARCH_PROMPT',
     
     # Crypto Compare tools
     "fetch_news_tool", "FetchNewsInput", "FETCH_NEWS_PROMPT",

@@ -20,6 +20,9 @@ fastapi = "^0.109.2"
 uvicorn = "^0.27.1"
 python-dotenv = "^1.0.1"
 langchain-groq = "^0.2.4"
+duckduckgo-search = "^7.3.2"
+langchain-community = "^0.3.17"
+langchain-google-genai = "^2.0.9"
 
 [build-system]
 requires = ["poetry-core"]

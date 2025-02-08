@@ -7,6 +7,7 @@ from contextlib import asynccontextmanager
 import json
 from langchain_core.messages import HumanMessage
 import uuid
+import os
 
 # Import agent-related functions
 from chatbot import initialize_agent
@@ -157,6 +158,39 @@ async def chat(request: ChatRequest):
                 if "agent" in chunk and chunk["agent"]["messages"][0].content:
                     response.append(chunk["agent"]["messages"][0].content)
             return {"response": " ".join(response)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/wallet/public_address")
+async def get_wallet_public_address():
+    """
+    Read the wallets_data.txt file and return the default_address_id.
+    """
+    file_path = "./wallet_data.txt"
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="Wallet file not found")
+    
+    try:
+        # Read the file content (assuming it contains a single JSON object)
+        with open(file_path, "r") as f:
+            content = f.read().strip()
+        
+        wallet_data = json.loads(content)
+        default_address = wallet_data.get("default_address_id")
+        
+        if not default_address:
+            raise HTTPException(
+                status_code=404,
+                detail="default_address_id not found in wallet data"
+            )
+        
+        return {"public_address": default_address}
+    
+    except json.JSONDecodeError:
+        raise HTTPException(
+            status_code=500,
+            detail="Error parsing wallet data file. Please ensure it is valid JSON."
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

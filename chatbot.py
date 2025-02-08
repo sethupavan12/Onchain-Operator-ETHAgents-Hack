@@ -60,6 +60,7 @@ from tools import (
 
     # Browser search
     when_no_api_search_like_human,
+    web_search_tool, WebSearchInput, WEB_SEARCH_PROMPT,
 )
 
 # Configure a file to persist the agent's CDP MPC Wallet Data.
@@ -115,6 +116,15 @@ def initialize_agent():
         cdp_agentkit_wrapper=agentkit,
         args_schema=GenerateImageInput,
         func=create_dalle_tool,
+    )
+
+    # Web Search
+    webSearchTool = CdpTool(
+        name="web_search",
+        description=WEB_SEARCH_PROMPT,
+        cdp_agentkit_wrapper=agentkit,
+        args_schema=WebSearchInput,
+        func=web_search_tool,
     )
 
     # Crypto Compare
@@ -303,6 +313,7 @@ def initialize_agent():
     # Add additional tools.
     tools.append(deployMultiTokenTool)
     tools.append(dalleImageTool)
+    tools.append(webSearchTool)
 
     tools.extend([
     fetchNewsTool,
@@ -325,8 +336,8 @@ def initialize_agent():
     "If you ever need funds, you can request them from the faucet if you are on network ID `base-sepolia`. "
     "If not, you can provide your wallet details and request funds from the user. "
     "If someone asks you to do something you can't do with your currently available tools, say you don't have a tool to do that AND you must ask the user "
-    "'I can hack my way into AGI and answer your question. ask the user 'Do you consent? (Yes/No)' If yes, use the broser tool to search on internet."
-    "you must use the tool - when_no_api_search_like_human which takes the action you want to achieve and it has another agent who searches the internet for you"
+    "if the user asks you to show something or teach them how to do something, you must use the tool - when_no_api_search_like_human which takes has an agent that" 
+    "uses a web browser to actually navigate and show how that activity is done"
     "you just need to pass in the string query you want to 'achieve' and it can be a multi-step process the agent can handle it. "
     "bear in mind this takes bit of time so be careful using this and use it when users asks you to do something you can't do with your currently available tools"
     "Be concise and helpful with your responses. Refrain from restating your tools' descriptions unless it is explicitly requested."

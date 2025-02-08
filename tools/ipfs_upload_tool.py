@@ -72,7 +72,7 @@ def create_pinata_upload_tool(image_url: str, save_locally: bool = True) -> dict
         pinata_data = pinata_response.json()
 
         ipfs_hash = pinata_data.get("IpfsHash")
-        ipfs_url = f"https://gateway.pinata.cloud/ipfs/{ipfs_hash}" if ipfs_hash else None
+        ipfs_url = f"https://gateway.pinata.cloud/ipfs/{ipfs_hash}/" if ipfs_hash else None
 
         # Return the response in a structured format
         return {

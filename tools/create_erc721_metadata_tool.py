@@ -1,5 +1,8 @@
+
 import os
 import requests
+import json
+import io
 from typing import List, Optional
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
@@ -39,16 +42,7 @@ def create_erc721_metadata(
 ) -> dict:
     """
     Creates and uploads a standard ERC-721 metadata JSON file to IPFS via Pinata (JWT-based).
-    This function now accepts direct keyword arguments for each metadata field.
-    
-    Args:
-        name (str): Name of the NFT
-        description (str): Description of the NFT
-        image_ipfs_url (str): The IPFS URI or gateway URL of the NFT image
-        attributes (List[dict], optional): A list of attribute dictionaries
-
-    Returns:
-        dict: Structured response with the IPFS hash (CID), gateway URL, and the metadata uploaded.
+    The metadata will be wrapped in a directory so that it can be accessed at /0.
     """
     try:
         # Retrieve the JWT token from the environment variable
@@ -72,30 +66,39 @@ def create_erc721_metadata(
             "attributes": metadata_input.attributes
         }
 
-        # Prepare the request payload for Pinata's pinJSONToIPFS
-        url = "https://api.pinata.cloud/pinning/pinJSONToIPFS"
-        payload = {
-            "pinataOptions": {"cidVersion": 1},
-            "pinataMetadata": {
-                "name": f"{metadata_input.name} Metadata",
-                "keyvalues": {}
-            },
-            "pinataContent": metadata
+        # Convert metadata JSON into a bytes stream (simulate a file)
+        json_str = json.dumps(metadata)
+        json_bytes = io.BytesIO(json_str.encode("utf-8"))
+
+        # Build the multipart form-data parts:
+        # - "file": the actual file; name it "0" so that it becomes accessible via /0
+        # - "pinataMetadata": additional metadata about the upload
+        # - "pinataOptions": options for the upload (set cidVersion to 1 and wrapWithDirectory to True)
+        files = {
+            "file": ("0", json_bytes, "application/json"),  # File name "0" is crucial
+            "pinataMetadata": (None, json.dumps({
+                "name": f"{metadata_input.name} Metadata"
+            }), "application/json"),
+            "pinataOptions": (None, json.dumps({
+                "cidVersion": 1,
+                "wrapWithDirectory": True,
+            }), "application/json")
         }
 
+        url = "https://api.pinata.cloud/pinning/pinFileToIPFS"
         headers = {
-            "Content-Type": "application/json",
+            # Do not manually set Content-Type; let requests handle the multipart boundary.
             "Authorization": f"Bearer {jwt_token}"
         }
 
-        # Upload JSON to Pinata
-        response = requests.post(url, json=payload, headers=headers)
+        # Upload the file and related metadata/options to Pinata
+        response = requests.post(url, files=files, headers=headers)
         response.raise_for_status()
 
         # Parse Pinata response
         pinata_data = response.json()
         ipfs_hash = pinata_data.get("IpfsHash")
-        ipfs_url = f"https://gateway.pinata.cloud/ipfs/{ipfs_hash}" if ipfs_hash else None
+        ipfs_url = f"https://gateway.pinata.cloud/ipfs/{ipfs_hash}/0" if ipfs_hash else None
 
         return {
             "type": "ERC721-metadata",
@@ -130,15 +133,14 @@ Input: {
 """
 
 # Example usage (uncomment to test):
-# if __name__ == "__main__":
-#     result = create_erc721_metadata(
-#         name="My Awesome NFT",
-#         description="This is an awesome NFT with great utility.",
-#         image_ipfs_url="ipfs://QmHashOfTheImageOrUseGatewayUrl",
-#         attributes=[
-#             {"trait_type": "Level", "value": 1},
-#             {"trait_type": "Rarity", "value": "Rare"}
-#         ]
-#     )
-#     print(result)
-
+if __name__ == "__main__":
+    result = create_erc721_metadata(
+        name="My Awesome NFT",
+        description="This is an awesome NFT with great utility.",
+        image_ipfs_url="ipfs://QmHashOfTheImageOrUseGatewayUrl",
+        attributes=[
+            {"trait_type": "Level", "value": 1},
+            {"trait_type": "Rarity", "value": "Rare"}
+        ]
+    )
+    print(result)

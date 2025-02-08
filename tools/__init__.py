@@ -1,5 +1,6 @@
 from .token_tool import deploy_multi_token, DeployMultiTokenInput, DEPLOY_MULTITOKEN_PROMPT
 from .browser_tool import when_no_api_search_like_human
+from .dalle_tool import create_dalle_tool, GenerateImageInput, GENERATE_IMAGE_PROMPT
 from .crypto_compare_tools import (
     fetch_news_tool, FetchNewsInput, FETCH_NEWS_PROMPT,
     fetch_price, FetchPriceInput, FETCH_PRICE_PROMPT,
@@ -41,13 +42,20 @@ from .the_graph_uniswap_base_tools import (
 )
 
 __all__ = [
-    # Create Token Tool
-    "deploy_multi_token", "DeployMultiTokenInput", "DEPLOY_MULTITOKEN_PROMPT",
-
-    # Browser Search Tool
-    "when_no_api_search_like_human",
+    # Token tools
+    'deploy_multi_token',
+    'DeployMultiTokenInput',
+    'DEPLOY_MULTITOKEN_PROMPT',
     
-    # Crypto Compare Tools
+    # Browser tools
+    'when_no_api_search_like_human',
+    
+    # DALLE tools
+    'create_dalle_tool',
+    'GenerateImageInput',
+    'GENERATE_IMAGE_PROMPT',
+    
+    # Crypto Compare tools
     "fetch_news_tool", "FetchNewsInput", "FETCH_NEWS_PROMPT",
     "fetch_price", "FetchPriceInput", "FETCH_PRICE_PROMPT",
     "fetch_trading_signals", "FetchTradingSignalsInput", "FETCH_TRADING_SIGNALS_PROMPT",

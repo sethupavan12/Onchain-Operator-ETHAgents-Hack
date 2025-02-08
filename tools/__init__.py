@@ -2,6 +2,7 @@ from .token_tool import deploy_multi_token, DeployMultiTokenInput, DEPLOY_MULTIT
 from .browser_tool import when_no_api_search_like_human
 from .dalle_tool import create_dalle_tool, GenerateImageInput, GENERATE_IMAGE_PROMPT
 from .ipfs_upload_tool import create_pinata_upload_tool, UploadImageToPinataInput, UPLOAD_IMAGE_TO_PINATA_PROMPT 
+from .create_erc721_metadata_tool import create_erc721_metadata, UploadERC721MetadataInput, UPLOAD_ERC721_METADATA_PROMPT
 from .crypto_compare_tools import (
     fetch_news_tool, FetchNewsInput, FETCH_NEWS_PROMPT,
     fetch_price, FetchPriceInput, FETCH_PRICE_PROMPT,
@@ -100,4 +101,5 @@ __all__ = [
     "fetch_swap_trends", "GraphSwapTrendsInput", "GRAPH_SWAP_TRENDS_PROMPT",
     "fetch_gas_fees", "GraphGasFeesInput", "GRAPH_GAS_FEES_PROMPT",
     "fetch_arbitrage_opportunities", "GraphArbitrageInput", "GRAPH_ARBITRAGE_PROMPT",
+    "create_erc721_metadata", "UploadERC721MetadataInput", "UPLOAD_ERC721_METADATA_PROMPT" 
 ]

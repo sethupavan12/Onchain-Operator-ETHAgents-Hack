@@ -25,6 +25,7 @@ from tools import (
 
     # IPFS upload tools
     create_pinata_upload_tool, UploadImageToPinataInput, UPLOAD_IMAGE_TO_PINATA_PROMPT,
+    create_erc721_metadata, UploadERC721MetadataInput, UPLOAD_ERC721_METADATA_PROMPT,
 
     # crypto compare
     fetch_news_tool, FetchNewsInput, FETCH_NEWS_PROMPT,
@@ -128,6 +129,17 @@ def initialize_agent():
         cdp_agentkit_wrapper=agentkit,
         args_schema=UploadImageToPinataInput,
         func=create_pinata_upload_tool,
+    )
+
+    # IPFS ERC721 metadata upload tool
+    ipfsMetadataERC721Upload = CdpTool(
+        name="ipfs_metadata_erc721_upload",
+        description=UPLOAD_ERC721_METADATA_PROMPT,
+        cdp_agentkit_wrapper=agentkit,
+        args_schema=UploadERC721MetadataInput,
+        func=create_erc721_metadata,
+    )
+
     # Web Search
     webSearchTool = CdpTool(
         name="web_search",
@@ -319,6 +331,7 @@ def initialize_agent():
     tools.append(deployMultiTokenTool)
     tools.append(dalleImageTool)
     tools.append(ipfsUploadTool)
+    tools.append(ipfsMetadataERC721Upload)
     tools.append(webSearchTool)
 
     tools.extend([
@@ -346,6 +359,7 @@ def initialize_agent():
     "uses a web browser to actually navigate and show how that activity is done"
     "you just need to pass in the string query you want to 'achieve' and it can be a multi-step process the agent can handle it. "
     "bear in mind this takes bit of time so be careful using this and use it when users asks you to do something you can't do with your currently available tools"
+    "When minting an nft ensure that you use the base_uri only. do not append anything to it such as a number! "
     "Be concise and helpful with your responses. Refrain from restating your tools' descriptions unless it is explicitly requested."
     # Create ReAct Agent using the LLM and CDP Agentkit tools.
     return create_react_agent(

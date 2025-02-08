@@ -43,6 +43,11 @@ from .the_graph_uniswap_base_tools import (
     fetch_arbitrage_opportunities, GraphArbitrageInput, GRAPH_ARBITRAGE_PROMPT,
 )
 from .web2_access_tool import web_search_tool, WebSearchInput, WEB_SEARCH_PROMPT
+from .dalle_nft_tool import (
+    create_dalle_nft_tool,
+    DalleNftInput,
+    DALLE_NFT_PROMPT,
+)
 
 __all__ = [
     # Token tools
@@ -55,7 +60,8 @@ __all__ = [
     
     # DALLE tools
     'create_dalle_tool', 'GenerateImageInput', 'GENERATE_IMAGE_PROMPT',
-
+    'create_dalle_nft_tool', 'DalleNftInput', 'DALLE_NFT_PROMPT',
+    
     # IPFS upload tools
     "create_pinata_upload_tool", "UploadImageToPinataInput", "UPLOAD_IMAGE_TO_PINATA_PROMPT" 
     

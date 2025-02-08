@@ -22,10 +22,11 @@ from tools import (
 
     # DALLE tool
     create_dalle_tool, GenerateImageInput, GENERATE_IMAGE_PROMPT,
+    create_dalle_nft_tool, DalleNftInput, DALLE_NFT_PROMPT,
 
     # IPFS upload tools
     create_pinata_upload_tool, UploadImageToPinataInput, UPLOAD_IMAGE_TO_PINATA_PROMPT,
-    create_erc721_metadata, UploadERC721MetadataInput, UPLOAD_ERC721_METADATA_PROMPT,
+    # create_erc721_metadata, UploadERC721MetadataInput, UPLOAD_ERC721_METADATA_PROMPT,  # Temporarily commented out
 
     # crypto compare
     fetch_news_tool, FetchNewsInput, FETCH_NEWS_PROMPT,
@@ -99,10 +100,10 @@ def initialize_agent():
 
     # Initialize CDP Agentkit Toolkit and get tools.
     cdp_toolkit = CdpToolkit.from_cdp_agentkit_wrapper(agentkit)
-    tools = cdp_toolkit.get_tools()
+    cdp_tools = cdp_toolkit.get_tools()
     twitter_api_wrapper = TwitterApiWrapper()
     twitter_toolkit = TwitterToolkit.from_twitter_api_wrapper(twitter_api_wrapper)
-    tools.extend(twitter_toolkit.get_tools())
+    twitter_tools = twitter_toolkit.get_tools()
 
     # Create Token 
     deployMultiTokenTool = CdpTool(
@@ -122,6 +123,16 @@ def initialize_agent():
         func=create_dalle_tool,
     )
 
+    # DALLE NFT Generation
+    dalle_nft_tool = create_dalle_nft_tool()
+    dalleNFTTool = CdpTool(
+        name="generate_nft",
+        description=dalle_nft_tool["description"],
+        cdp_agentkit_wrapper=agentkit,
+        args_schema=dalle_nft_tool["args_schema"],
+        func=dalle_nft_tool["func"]
+    )
+
     # IPFS Uploader Using
     ipfsUploadTool = CdpTool(
         name="ipsf_upload_tool",
@@ -132,13 +143,14 @@ def initialize_agent():
     )
 
     # IPFS ERC721 metadata upload tool
-    ipfsMetadataERC721Upload = CdpTool(
-        name="ipfs_metadata_erc721_upload",
-        description=UPLOAD_ERC721_METADATA_PROMPT,
-        cdp_agentkit_wrapper=agentkit,
-        args_schema=UploadERC721MetadataInput,
-        func=create_erc721_metadata,
-    )
+    # Temporarily commented out
+    # ipfsMetadataERC721Upload = CdpTool(
+    #     name="ipfs_metadata_erc721_upload",
+    #     description=UPLOAD_ERC721_METADATA_PROMPT,
+    #     cdp_agentkit_wrapper=agentkit,
+    #     args_schema=UploadERC721MetadataInput,
+    #     func=create_erc721_metadata,
+    # )
 
     # Web Search
     webSearchTool = CdpTool(
@@ -328,20 +340,22 @@ def initialize_agent():
     ]
 
     # Add additional tools.
-    tools.append(deployMultiTokenTool)
-    tools.append(dalleImageTool)
-    tools.append(ipfsUploadTool)
-    tools.append(ipfsMetadataERC721Upload)
-    tools.append(webSearchTool)
-
-    tools.extend([
-    fetchNewsTool,
-    fetchPriceTool,
-    fetchTradingSignalsTool,
-    fetchTopMarketCapTool,
-    fetchTopExchangesTool,
-    fetchTopVolumeTool
-    ])
+    tools = [
+        dalleImageTool,
+        dalleNFTTool,
+        *cdp_tools,
+        *twitter_tools,
+        webSearchTool,
+        deployMultiTokenTool,
+        ipfsUploadTool,
+        # ipfsMetadataERC721Upload,  # Temporarily commented out
+        fetchNewsTool,
+        fetchPriceTool,
+        fetchTradingSignalsTool,
+        fetchTopMarketCapTool,
+        fetchTopExchangesTool,
+        fetchTopVolumeTool
+    ]
     tools.extend(moralisTools)
     tools.extend(theGraphUniswapV3Tools)
 

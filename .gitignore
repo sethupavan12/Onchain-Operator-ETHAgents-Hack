@@ -8,3 +8,4 @@ __pycache__/
 .env*
 wallet_data.txt
 *.png
+**/.DS_Store

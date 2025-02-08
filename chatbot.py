@@ -23,6 +23,9 @@ from tools import (
     # DALLE tool
     create_dalle_tool, GenerateImageInput, GENERATE_IMAGE_PROMPT,
 
+    # IPFS upload tools
+    create_pinata_upload_tool, UploadImageToPinataInput, UPLOAD_IMAGE_TO_PINATA_PROMPT,
+
     # crypto compare
     fetch_news_tool, FetchNewsInput, FETCH_NEWS_PROMPT,
     fetch_price, FetchPriceInput, FETCH_PRICE_PROMPT,
@@ -118,6 +121,13 @@ def initialize_agent():
         func=create_dalle_tool,
     )
 
+    # IPFS Uploader Using
+    ipfsUploadTool = CdpTool(
+        name="ipsf_upload_tool",
+        description=UPLOAD_IMAGE_TO_PINATA_PROMPT,
+        cdp_agentkit_wrapper=agentkit,
+        args_schema=UploadImageToPinataInput,
+        func=create_pinata_upload_tool,
     # Web Search
     webSearchTool = CdpTool(
         name="web_search",
@@ -135,7 +145,6 @@ def initialize_agent():
         args_schema=FetchNewsInput,
         func=fetch_news_tool,
     )
-
     fetchPriceTool = CdpTool(
         name="fetch_price",
         description=FETCH_PRICE_PROMPT,
@@ -143,7 +152,6 @@ def initialize_agent():
         args_schema=FetchPriceInput,
         func=fetch_price,
     )
-
     fetchTradingSignalsTool = CdpTool(
         name="fetch_trading_signals",
         description=FETCH_TRADING_SIGNALS_PROMPT,
@@ -151,7 +159,6 @@ def initialize_agent():
         args_schema=FetchTradingSignalsInput,
         func=fetch_trading_signals,
     )
-
     fetchTopMarketCapTool = CdpTool(
         name="fetch_top_market_cap",
         description=FETCH_TOP_MARKET_CAP_PROMPT,
@@ -159,7 +166,6 @@ def initialize_agent():
         args_schema=FetchTopMarketCapInput,
         func=fetch_top_market_cap,
     )
-
     fetchTopExchangesTool = CdpTool(
         name="fetch_top_exchanges",
         description=FETCH_TOP_EXCHANGES_PROMPT,
@@ -167,7 +173,6 @@ def initialize_agent():
         args_schema=FetchTopExchangesInput,
         func=fetch_top_exchanges,
     )
-
     fetchTopVolumeTool = CdpTool(
         name="fetch_top_volume",
         description=FETCH_TOP_VOLUME_PROMPT,
@@ -313,6 +318,7 @@ def initialize_agent():
     # Add additional tools.
     tools.append(deployMultiTokenTool)
     tools.append(dalleImageTool)
+    tools.append(ipfsUploadTool)
     tools.append(webSearchTool)
 
     tools.extend([

@@ -1,6 +1,7 @@
 from .token_tool import deploy_multi_token, DeployMultiTokenInput, DEPLOY_MULTITOKEN_PROMPT
 from .browser_tool import when_no_api_search_like_human
 from .dalle_tool import create_dalle_tool, GenerateImageInput, GENERATE_IMAGE_PROMPT
+from .ipfs_upload_tool import create_pinata_upload_tool, UploadImageToPinataInput, UPLOAD_IMAGE_TO_PINATA_PROMPT 
 from .crypto_compare_tools import (
     fetch_news_tool, FetchNewsInput, FETCH_NEWS_PROMPT,
     fetch_price, FetchPriceInput, FETCH_PRICE_PROMPT,
@@ -52,9 +53,10 @@ __all__ = [
     'when_no_api_search_like_human',
     
     # DALLE tools
-    'create_dalle_tool',
-    'GenerateImageInput',
-    'GENERATE_IMAGE_PROMPT',
+    'create_dalle_tool', 'GenerateImageInput', 'GENERATE_IMAGE_PROMPT',
+
+    # IPFS upload tools
+    "create_pinata_upload_tool", "UploadImageToPinataInput", "UPLOAD_IMAGE_TO_PINATA_PROMPT" 
     
     # Web Search tools
     'web_search_tool',

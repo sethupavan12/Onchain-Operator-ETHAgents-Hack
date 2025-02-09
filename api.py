@@ -122,6 +122,13 @@ async def stream_response(message: str, session_id: str) -> Iterator[str]:
         
         # Get full conversation history
         history = conversation_manager.get_history(session_id)
+
+        # Send session ID first
+        yield json.dumps({
+            "type": "session",
+            "content": "Session started",
+            "session_id": session_id
+        }) + "\n"
         
         for chunk in agent_instance.stream(
             {"messages": history},
@@ -132,14 +139,16 @@ async def stream_response(message: str, session_id: str) -> Iterator[str]:
                 current_response.append(content)
                 yield json.dumps({
                     "type": "message",
-                    "content": content
+                    "content": content,
+                    "session_id": session_id
                 }) + "\n"
             elif "tools" in chunk:
                 tool_desc = get_tool_description(chunk)
                 if tool_desc:
                     yield json.dumps({
                         "type": "tool",
-                        "content": tool_desc["content"]
+                        "content": tool_desc["content"],
+                        "session_id": session_id
                     }) + "\n"
         
         # Add agent's response to history
@@ -150,13 +159,15 @@ async def stream_response(message: str, session_id: str) -> Iterator[str]:
         # Send completion message
         yield json.dumps({
             "type": "complete",
-            "content": "Task completed"
+            "content": "Task completed",
+            "session_id": session_id
         }) + "\n"
         
     except Exception as e:
         yield json.dumps({
             "type": "error",
-            "content": str(e)
+            "content": str(e),
+            "session_id": session_id
         }) + "\n"
 
 @app.post("/chat")

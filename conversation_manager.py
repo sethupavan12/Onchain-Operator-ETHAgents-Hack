@@ -51,9 +51,15 @@ class ConversationManager:
         except Exception as e:
             print(f"Error saving histories: {e}")
     
-    def get_history(self, session_id: str) -> List[BaseMessage]:
-        """Get conversation history for a session"""
-        return self.histories.get(session_id, [])
+    def get_history(self, session_id: str, limit: int = 10) -> List[BaseMessage]:
+        """Get conversation history for a session
+        
+        Args:
+            session_id: The session ID
+            limit: Number of most recent messages to return, defaults to 10
+        """
+        history = self.histories.get(session_id, [])
+        return history[-limit:]
     
     def add_message(self, session_id: str, message: BaseMessage):
         """Add a message to a session's history"""

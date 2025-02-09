@@ -13,6 +13,10 @@ WEB_SEARCH_PROMPT = """
 This tool performs a web2 search using DuckDuckGo and returns relevant results.
 Use this when you need to find current or factual information from the web.
 
+Don't use this tool for anything about web3 like finding tokens etc.
+Unless it is about finding some info about something that can be found easily.
+Don't bother with this tool.
+
 Example:
 Input: {
     "query": "What is the capital of France?"

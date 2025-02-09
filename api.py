@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, Iterator, Tuple, Dict, List
 import asyncio
@@ -37,6 +38,15 @@ app = FastAPI(
     title="Agent API",
     description="API to interact with the AI agent",
     lifespan=lifespan
+)
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 class ChatRequest(BaseModel):
@@ -106,31 +116,47 @@ async def stream_response(message: str, session_id: str) -> Iterator[str]:
         run_config = get_run_config()
         current_response = []
         
+        # Add user message to history
+        user_message = HumanMessage(content=message)
+        conversation_manager.add_message(session_id, user_message)
+        
+        # Get full conversation history
+        history = conversation_manager.get_history(session_id)
+        
         for chunk in agent_instance.stream(
-            {"messages": conversation_manager.get_history(session_id)},
+            {"messages": history},
             run_config
         ):
             if "agent" in chunk and chunk["agent"]["messages"][0].content:
                 content = chunk["agent"]["messages"][0].content
                 current_response.append(content)
                 yield json.dumps({
-                    "step": "message",
-                    "data": content
+                    "type": "message",
+                    "content": content
                 }) + "\n"
-            elif "tool" in chunk:
-                yield json.dumps({
-                    "step": "tool",
-                    "data": get_tool_description(chunk)
-                }) + "\n"
+            elif "tools" in chunk:
+                tool_desc = get_tool_description(chunk)
+                if tool_desc:
+                    yield json.dumps({
+                        "type": "tool",
+                        "content": tool_desc["content"]
+                    }) + "\n"
         
         # Add agent's response to history
-        ai_message = AIMessage(content=" ".join(current_response))
-        conversation_manager.add_message(session_id, ai_message)
+        if current_response:
+            ai_message = AIMessage(content=" ".join(current_response))
+            conversation_manager.add_message(session_id, ai_message)
+        
+        # Send completion message
+        yield json.dumps({
+            "type": "complete",
+            "content": "Task completed"
+        }) + "\n"
         
     except Exception as e:
         yield json.dumps({
-            "step": "error",
-            "data": str(e)
+            "type": "error",
+            "content": str(e)
         }) + "\n"
 
 @app.post("/chat")
@@ -148,18 +174,18 @@ async def chat(request: ChatRequest):
         # Create or get session ID
         session_id = request.session_id or str(uuid.uuid4())
         
-        # Add user message to history
-        user_message = HumanMessage(content=request.message)
-        conversation_manager.add_message(session_id, user_message)
-        
-        run_config = get_run_config()
         if request.stream:
             return StreamingResponse(
                 stream_response(request.message, session_id),
                 media_type='text/event-stream'
             )
         else:
+            # Add user message to history
+            user_message = HumanMessage(content=request.message)
+            conversation_manager.add_message(session_id, user_message)
+            
             response = []
+            run_config = get_run_config()
             for chunk in agent_instance.stream(
                 {"messages": conversation_manager.get_history(session_id)},
                 run_config
@@ -168,13 +194,12 @@ async def chat(request: ChatRequest):
                     response.append(chunk["agent"]["messages"][0].content)
             
             # Add agent's response to history
-            ai_message = AIMessage(content=" ".join(response))
-            conversation_manager.add_message(session_id, ai_message)
+            if response:
+                ai_message = AIMessage(content=" ".join(response))
+                conversation_manager.add_message(session_id, ai_message)
             
-            return {
-                "response": " ".join(response),
-                "session_id": session_id
-            }
+            return {"response": " ".join(response)}
+            
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

@@ -1,4 +1,4 @@
-
+# DEPRECATED by dalle_nft_tool.py
 import os
 import requests
 import json

@@ -21,7 +21,6 @@ from tools import (
     deploy_multi_token, DeployMultiTokenInput, DEPLOY_MULTITOKEN_PROMPT,
 
     # DALLE tool
-    create_dalle_tool, GenerateImageInput, GENERATE_IMAGE_PROMPT,
     create_dalle_nft_tool, DalleNftInput, DALLE_NFT_PROMPT,
 
     # IPFS upload tools
@@ -112,15 +111,6 @@ def initialize_agent():
         cdp_agentkit_wrapper=agentkit,
         args_schema=DeployMultiTokenInput,
         func=deploy_multi_token,
-    )
-
-    # DALLE Image Generation
-    dalleImageTool = CdpTool(
-        name="generate_image",
-        description=GENERATE_IMAGE_PROMPT,
-        cdp_agentkit_wrapper=agentkit,
-        args_schema=GenerateImageInput,
-        func=create_dalle_tool,
     )
 
     # DALLE NFT Generation
@@ -341,7 +331,6 @@ def initialize_agent():
 
     # Add additional tools.
     tools = [
-        dalleImageTool,
         dalleNFTTool,
         *cdp_tools,
         *twitter_tools,

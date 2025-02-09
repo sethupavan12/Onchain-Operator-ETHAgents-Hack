@@ -1,6 +1,6 @@
 from .token_tool import deploy_multi_token, DeployMultiTokenInput, DEPLOY_MULTITOKEN_PROMPT
 from .browser_tool import when_no_api_search_like_human
-from .dalle_tool import create_dalle_tool, GenerateImageInput, GENERATE_IMAGE_PROMPT
+from .dalle_nft_tool import create_dalle_nft_tool, DalleNftInput, DALLE_NFT_PROMPT
 from .ipfs_upload_tool import create_pinata_upload_tool, UploadImageToPinataInput, UPLOAD_IMAGE_TO_PINATA_PROMPT 
 from .create_erc721_metadata_tool import create_erc721_metadata, UploadERC721MetadataInput, UPLOAD_ERC721_METADATA_PROMPT
 from .crypto_compare_tools import (
@@ -59,7 +59,6 @@ __all__ = [
     'when_no_api_search_like_human',
     
     # DALLE tools
-    'create_dalle_tool', 'GenerateImageInput', 'GENERATE_IMAGE_PROMPT',
     'create_dalle_nft_tool', 'DalleNftInput', 'DALLE_NFT_PROMPT',
     
     # IPFS upload tools

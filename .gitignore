@@ -9,3 +9,4 @@ __pycache__/
 wallet_data.txt
 *.png
 **/.DS_Store
+conversation_histories.json

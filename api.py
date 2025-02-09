@@ -1,31 +1,36 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
-from typing import Optional, Iterator, Tuple
+from typing import Optional, Iterator, Tuple, Dict, List
 import asyncio
 from contextlib import asynccontextmanager
 import json
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import HumanMessage, AIMessage
 import uuid
 import os
 
 # Import agent-related functions
 from chatbot import initialize_agent
+from conversation_manager import ConversationManager
 
 # Global variables for agent and config
 agent_instance = None
 agent_config = None
+conversation_manager = None
+conversation_histories: Dict[str, List[dict]] = {}
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Initialize the agent on startup
-    global agent_instance, agent_config
+    # Initialize the agent and conversation manager on startup
+    global agent_instance, agent_config, conversation_manager
     print("Initializing agent...")
     agent_instance, agent_config = initialize_agent()
+    conversation_manager = ConversationManager()
     yield
-    # Cleanup (if needed) on shutdown
+    # Cleanup on shutdown
     agent_instance = None
     agent_config = None
+    conversation_manager = None
 
 # Initialize FastAPI with lifespan
 app = FastAPI(
@@ -37,6 +42,7 @@ app = FastAPI(
 class ChatRequest(BaseModel):
     message: str
     stream: bool = False
+    session_id: Optional[str] = None
 
 def get_run_config():
     """Get configuration for a new run with required checkpointer keys"""
@@ -94,41 +100,37 @@ def get_tool_description(chunk):
             }
     return None
 
-async def stream_response(message: str) -> Iterator[str]:
+async def stream_response(message: str, session_id: str) -> Iterator[str]:
     """Stream the agent's response"""
     try:
         run_config = get_run_config()
-        # Send initial thinking message
-        yield json.dumps({
-            "type": "thinking",
-            "content": "Processing your request...",
-            "step": "start"
-        }) + "\n"
+        current_response = []
         
         for chunk in agent_instance.stream(
-            {"messages": [HumanMessage(content=message)]},
+            {"messages": conversation_manager.get_history(session_id)},
             run_config
         ):
-            # Send tool usage description if available
-            tool_desc = get_tool_description(chunk)
-            if tool_desc:
-                yield json.dumps(tool_desc) + "\n"
-                await asyncio.sleep(0.1)
-                continue
-
             if "agent" in chunk and chunk["agent"]["messages"][0].content:
+                content = chunk["agent"]["messages"][0].content
+                current_response.append(content)
                 yield json.dumps({
-                    "type": "message",
-                    "content": chunk["agent"]["messages"][0].content,
-                    "step": "response"
+                    "step": "message",
+                    "data": content
                 }) + "\n"
-            
-            await asyncio.sleep(0.1)  # Add a small delay between chunks
+            elif "tool" in chunk:
+                yield json.dumps({
+                    "step": "tool",
+                    "data": get_tool_description(chunk)
+                }) + "\n"
+        
+        # Add agent's response to history
+        ai_message = AIMessage(content=" ".join(current_response))
+        conversation_manager.add_message(session_id, ai_message)
+        
     except Exception as e:
         yield json.dumps({
-            "type": "error",
-            "content": str(e),
-            "step": "error"
+            "step": "error",
+            "data": str(e)
         }) + "\n"
 
 @app.post("/chat")
@@ -139,25 +141,40 @@ async def chat(request: ChatRequest):
     If stream=True, returns a streaming response
     If stream=False, returns a regular JSON response
     """
-    if agent_instance is None:
+    if agent_instance is None or conversation_manager is None:
         raise HTTPException(status_code=500, detail="Agent not initialized")
     
     try:
+        # Create or get session ID
+        session_id = request.session_id or str(uuid.uuid4())
+        
+        # Add user message to history
+        user_message = HumanMessage(content=request.message)
+        conversation_manager.add_message(session_id, user_message)
+        
         run_config = get_run_config()
         if request.stream:
             return StreamingResponse(
-                stream_response(request.message),
+                stream_response(request.message, session_id),
                 media_type='text/event-stream'
             )
         else:
             response = []
             for chunk in agent_instance.stream(
-                {"messages": [HumanMessage(content=request.message)]},
+                {"messages": conversation_manager.get_history(session_id)},
                 run_config
             ):
                 if "agent" in chunk and chunk["agent"]["messages"][0].content:
                     response.append(chunk["agent"]["messages"][0].content)
-            return {"response": " ".join(response)}
+            
+            # Add agent's response to history
+            ai_message = AIMessage(content=" ".join(response))
+            conversation_manager.add_message(session_id, ai_message)
+            
+            return {
+                "response": " ".join(response),
+                "session_id": session_id
+            }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

@@ -354,7 +354,8 @@ def initialize_agent():
     memory = MemorySaver()
     config = {"configurable": {"thread_id": "CDP Agentkit Chatbot Example!"}}
 
-    prompt = "You are a helpful agent that can interact with the blockchain using some tools. You are empowered to interact onchain using your tools."
+    prompt = "You are a helpful agent that helps manage a user's wallet you are part of that wallet" 
+    "you can interact with the blockchain using some tools. You are empowered to interact onchain using your tools."
     "If you ever need funds, you can request them from the faucet if you are on network ID `base-sepolia`. "
     "If not, you can provide your wallet details and request funds from the user. "
     "If someone asks you to do something you can't do with your currently available tools, say you don't have a tool to do that AND you must ask the user "
